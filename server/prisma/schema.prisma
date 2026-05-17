@@ -1,0 +1,122 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Mandal {
+  id              String   @id @default(uuid())
+  name            String
+  inviteCode      String   @unique @default(uuid())
+  ownerId         String?
+  sponsorId       String?
+  requireApproval Boolean  @default(false)
+  sponsor         Sponsor? @relation(fields: [sponsorId], references: [id])
+  users           User[]
+  requests        Request[]
+  events          Event[]
+  stats           MandalStats?
+  createdAt       DateTime @default(now())
+}
+
+model Sponsor {
+  id        String   @id @default(uuid())
+  name      String
+  logoUrl   String?
+  link      String?
+  mandals   Mandal[]
+}
+
+model User {
+  id            String   @id @default(uuid())
+  phone         String   @unique
+  name          String?
+  role          Role     @default(MEMBER)
+  status        UserStatus @default(APPROVED)
+  mandalId      String
+  mandal        Mandal   @relation(fields: [mandalId], references: [id])
+  requests      Request[] @relation("Requester")
+  assignments   Assignment[]
+  createdAt     DateTime @default(now())
+}
+
+model Event {
+  id          String   @id @default(uuid())
+  title       String
+  description String?
+  mandalId    String
+  mandal      Mandal   @relation(fields: [mandalId], references: [id])
+  requests    Request[]
+  createdAt   DateTime @default(now())
+}
+
+model Request {
+  id            String   @id @default(uuid())
+  category      ServiceCategory
+  dateTime      DateTime
+  location      String
+  notes         String?
+  status        RequestStatus @default(OPEN)
+  maxVolunteers Int      @default(1)
+  reportCount   Int      @default(0)
+  isHidden      Boolean  @default(false)
+  requesterId   String
+  requester     User     @relation("Requester", fields: [requesterId], references: [id])
+  assignments   Assignment[]
+  mandalId      String
+  mandal        Mandal   @relation(fields: [mandalId], references: [id])
+  eventId       String?
+  event         Event?   @relation(fields: [eventId], references: [id])
+  createdAt     DateTime @default(now())
+}
+
+model Assignment {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  requestId   String
+  request     Request  @relation(fields: [requestId], references: [id])
+  createdAt   DateTime @default(now())
+
+  @@unique([userId, requestId])
+}
+
+model MandalStats {
+  id            String @id @default(uuid())
+  mandalId      String @unique
+  mandal        Mandal @relation(fields: [mandalId], references: [id])
+  messagesSent  Int    @default(0)
+  threshold     Int    @default(500)
+}
+
+enum Role {
+  SUPER_ADMIN
+  ADMIN
+  MEMBER
+  VOLUNTEER
+}
+
+enum UserStatus {
+  PENDING
+  APPROVED
+  BANNED
+}
+
+enum ServiceCategory {
+  RIDE
+  GROCERY_DELIVERY
+  TECH_SUPPORT
+  HEAVY_LIFTING
+  OTHER
+  EVENT_SHIFT
+}
+
+enum RequestStatus {
+  OPEN
+  MATCHED
+  COMPLETED
+}
