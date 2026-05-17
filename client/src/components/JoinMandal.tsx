@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../api';
 import { UserPlus, ShieldCheck } from 'lucide-react';
 import PhoneInput from './PhoneInput';
 
@@ -15,7 +15,7 @@ const JoinMandal = ({ onLogin }: { onLogin: (userData: any) => void }) => {
   useEffect(() => {
     const fetchMandal = async () => {
       try {
-        const response = await axios.get(`http://localhost:3001/api/join/${inviteCode}`);
+        const response = await api.get(`/api/join/${inviteCode}`);
         setMandal(response.data);
       } catch (error) {
         console.error('Mandal not found', error);
@@ -40,7 +40,7 @@ const JoinMandal = ({ onLogin }: { onLogin: (userData: any) => void }) => {
     e.preventDefault();
     try {
       const fullPhone = `${phonePrefix}${phone}`;
-      const response = await axios.post('http://localhost:3001/api/auth/login', {
+      const response = await api.post('/api/auth/login', {
         phone: fullPhone,
         mandalId: mandal.id,
         name: name || 'Anonymous Member'

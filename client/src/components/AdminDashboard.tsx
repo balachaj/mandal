@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import api from '../api';
 import { 
   Users, Globe, ShieldAlert, Trash2, UserMinus, 
   ExternalLink, Calendar, Flag, CheckCircle, 
@@ -28,22 +28,22 @@ const AdminDashboard = ({ currentMandalId }: { currentMandalId?: string }) => {
     setLoading(true);
     try {
       if (activeTab === 'users' && currentMandalId) {
-        const res = await axios.get(`http://localhost:3001/api/mandals/${currentMandalId}/users`);
+        const res = await api.get(`/api/mandals/${currentMandalId}/users`);
         setUsers(res.data);
       } else if (activeTab === 'mandals') {
-        const res = await axios.get('http://localhost:3001/api/admin/mandals');
+        const res = await api.get('/api/admin/mandals');
         setMandals(res.data);
       } else if (activeTab === 'flagged') {
-        const res = await axios.get('http://localhost:3001/api/admin/flagged');
+        const res = await api.get('/api/admin/flagged');
         setFlagged(res.data);
       } else if (activeTab === 'settings' && currentMandalId) {
-        const res = await axios.get(`http://localhost:3001/api/mandals/${currentMandalId}/settings`);
+        const res = await api.get(`/api/mandals/${currentMandalId}/settings`);
         setMandalSettings(res.data);
         setSettingsForm({
           name: res.data.name,
           sponsorName: res.data.sponsor?.name || '',
           sponsorLogo: res.data.sponsor?.logoUrl || '',
-          sponsorLink: res.data.sponsor?.link || '',
+          sponsorLink: res.data.sponsor?.link || '' ,
           requireApproval: res.data.requireApproval
         });
       }
@@ -62,7 +62,7 @@ const AdminDashboard = ({ currentMandalId }: { currentMandalId?: string }) => {
     e.preventDefault();
     setSaving(true);
     try {
-      await axios.patch(`http://localhost:3001/api/mandals/${currentMandalId}/settings`, settingsForm);
+      await api.patch(`/api/mandals/${currentMandalId}/settings`, settingsForm);
       alert('Settings updated successfully!');
       fetchData();
     } catch (error) {
@@ -74,7 +74,7 @@ const AdminDashboard = ({ currentMandalId }: { currentMandalId?: string }) => {
 
   const handleUserStatus = async (userId: string, status: string) => {
     try {
-      await axios.post(`http://localhost:3001/api/users/${userId}/status`, { status });
+      await api.post(`/api/users/${userId}/status`, { status });
       fetchData();
     } catch (error) {
       alert('Failed to update member status');
@@ -84,7 +84,7 @@ const AdminDashboard = ({ currentMandalId }: { currentMandalId?: string }) => {
   const handleResetStats = async () => {
     if (!window.confirm('Reset message counter? This is usually done after a top-up.')) return;
     try {
-      await axios.post(`http://localhost:3001/api/mandals/${currentMandalId}/reset-stats`);
+      await api.post(`/api/mandals/${currentMandalId}/reset-stats`);
       fetchData();
     } catch (error) {
       alert('Reset failed');
@@ -94,7 +94,7 @@ const AdminDashboard = ({ currentMandalId }: { currentMandalId?: string }) => {
   const handleDeleteRequest = async (id: string) => {
     if (!window.confirm('Are you sure you want to permanently delete this request?')) return;
     try {
-      await axios.delete(`http://localhost:3001/api/requests/${id}`);
+      await api.delete(`/api/requests/${id}`);
       fetchData();
     } catch (error) {
       alert('Delete failed');

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import api from '../api';
 import { Calendar, MapPin, CheckCircle2, User, Clock, ChevronRight, Inbox, Award, Flag, ShieldAlert, Users } from 'lucide-react';
 
 const VolunteerFeed = ({ mandalId, volunteerId }: { mandalId: string; volunteerId: string }) => {
@@ -12,8 +12,8 @@ const VolunteerFeed = ({ mandalId, volunteerId }: { mandalId: string; volunteerI
   const fetchData = async () => {
     try {
       const [reqRes, taskRes] = await Promise.all([
-        axios.get(`http://localhost:3001/api/mandals/${mandalId}/requests?userId=${volunteerId}`),
-        axios.get(`http://localhost:3001/api/users/${volunteerId}/tasks`)
+        api.get(`/api/mandals/${mandalId}/requests?userId=${volunteerId}`),
+        api.get(`/api/users/${volunteerId}/tasks`)
       ]);
       setRequests(reqRes.data);
       setMyTasks(taskRes.data);
@@ -36,7 +36,7 @@ const VolunteerFeed = ({ mandalId, volunteerId }: { mandalId: string; volunteerI
 
   const handleAccept = async (requestId: string) => {
     try {
-      await axios.post(`http://localhost:3001/api/requests/${requestId}/match`, { volunteerId });
+      await api.post(`/api/requests/${requestId}/match`, { volunteerId });
       alert('Task accepted! Thank you for your stewardship.');
       fetchData();
       setActiveTab('my-tasks');
@@ -48,7 +48,7 @@ const VolunteerFeed = ({ mandalId, volunteerId }: { mandalId: string; volunteerI
   const handleReport = async (requestId: string) => {
     if (!window.confirm('Is this request inappropriate or harmful? Reporting helps keep our Mandal safe.')) return;
     try {
-      await axios.post(`http://localhost:3001/api/requests/${requestId}/report`);
+      await api.post(`/api/requests/${requestId}/report`);
       alert('Thank you. Community safety is our priority. Our admins will review this.');
       fetchData();
     } catch (error) {
@@ -58,7 +58,7 @@ const VolunteerFeed = ({ mandalId, volunteerId }: { mandalId: string; volunteerI
 
   const handleComplete = async (requestId: string) => {
     try {
-      await axios.post(`http://localhost:3001/api/requests/${requestId}/complete`);
+      await api.post(`/api/requests/${requestId}/complete`);
       alert('Great job, neighbor! Task marked as completed.');
       fetchData();
     } catch (error) {

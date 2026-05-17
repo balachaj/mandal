@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../api';
 import { PlusCircle, Image, Users, Copy, Check } from 'lucide-react';
 
 const CreateMandal = ({ user }: { user: any }) => {
@@ -17,7 +17,7 @@ const CreateMandal = ({ user }: { user: any }) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:3001/api/mandals', {
+      const response = await api.post('/api/mandals', {
         ...formData,
         creatorId: user?.id
       });

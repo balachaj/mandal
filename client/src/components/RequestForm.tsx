@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import api from '../api';
 import { Calendar, MapPin, ClipboardList, Send, Info } from 'lucide-react';
 
 const RequestForm = ({ mandalId, requesterId }: { mandalId: string; requesterId: string }) => {
@@ -19,7 +19,7 @@ const RequestForm = ({ mandalId, requesterId }: { mandalId: string; requesterId:
     const finalCategory = formData.category === 'OTHER' ? formData.customCategory : formData.category;
     
     try {
-      const response = await axios.post('http://localhost:3001/api/requests', {
+      const response = await api.post('/api/requests', {
         ...formData,
         category: finalCategory,
         mandalId,
@@ -27,9 +27,9 @@ const RequestForm = ({ mandalId, requesterId }: { mandalId: string; requesterId:
       });
       setLastRequest(response.data);
       setSubmitted(true);
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
-      alert('Failed to submit request. Is the server running?');
+      alert(error.response?.data?.error || 'Failed to submit request.');
     }
   };
 
@@ -78,12 +78,12 @@ const RequestForm = ({ mandalId, requesterId }: { mandalId: string; requesterId:
   }
 
   return (
-    <div className="w-full max-w-xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-700">
+    <div className="w-full max-w-xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-700 text-left">
       <div className="bg-white rounded-2xl shadow-xl shadow-indigo-100/50 border border-gray-100 overflow-hidden">
         {/* Header Section */}
         <div className="bg-indigo-600 px-6 py-8 text-white">
-          <h2 className="text-2xl font-bold">Request Assistance</h2>
-          <p className="text-indigo-100 mt-1">Submit a request and your local Mandal will be notified.</p>
+          <h2 className="text-2xl font-bold font-serif italic">Request Assistance</h2>
+          <p className="text-indigo-100 mt-1 font-medium text-sm tracking-wide">Submit a request and your local Mandal will be notified.</p>
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 sm:p-8 space-y-6">
@@ -94,7 +94,7 @@ const RequestForm = ({ mandalId, requesterId }: { mandalId: string; requesterId:
               <span>Service Category</span>
             </label>
             <select 
-              className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all outline-none appearance-none"
+              className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all outline-none appearance-none font-medium"
               value={formData.category}
               onChange={(e) => setFormData({...formData, category: e.target.value})}
             >
@@ -112,7 +112,7 @@ const RequestForm = ({ mandalId, requesterId }: { mandalId: string; requesterId:
               <input 
                 type="text"
                 placeholder="What do you need help with?"
-                className="w-full bg-gray-50 border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none"
+                className="w-full bg-gray-50 border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none font-medium"
                 required
                 onChange={(e) => setFormData({...formData, customCategory: e.target.value})}
               />
@@ -129,7 +129,7 @@ const RequestForm = ({ mandalId, requesterId }: { mandalId: string; requesterId:
               <input 
                 type="datetime-local"
                 step="900" 
-                className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all outline-none"
+                className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all outline-none font-medium text-sm"
                 required
                 onChange={(e) => setFormData({...formData, dateTime: e.target.value})}
               />
@@ -144,7 +144,7 @@ const RequestForm = ({ mandalId, requesterId }: { mandalId: string; requesterId:
               <input 
                 type="text"
                 placeholder="e.g. 123 Maple St"
-                className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all outline-none"
+                className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all outline-none font-medium text-sm"
                 required
                 onChange={(e) => setFormData({...formData, location: e.target.value})}
               />
@@ -159,7 +159,7 @@ const RequestForm = ({ mandalId, requesterId }: { mandalId: string; requesterId:
             </label>
             <textarea 
               placeholder="Provide any extra info to help neighbors..."
-              className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none min-h-[100px]"
+              className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none min-h-[100px] font-medium text-sm"
               onChange={(e) => setFormData({...formData, notes: e.target.value})}
             />
           </div>
@@ -175,7 +175,7 @@ const RequestForm = ({ mandalId, requesterId }: { mandalId: string; requesterId:
         </form>
       </div>
 
-      <p className="mt-6 text-center text-gray-400 text-sm italic">
+      <p className="mt-6 text-center text-gray-400 text-sm italic font-medium">
         "Trust is the bridge between community and resilience."
       </p>
     </div>

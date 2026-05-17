@@ -19,19 +19,20 @@ const EventForm = ({ mandalId, requesterId }: { mandalId: string; requesterId: s
   const updateSlot = (index: number, field: string, value: any) => {
     const newSlots = [...slots];
     (newSlots[index] as any)[field] = value;
-    setSlots(newSlots);
-  };
+    import api from '../api';
+    ...
+      const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        try {
+          await api.post('/api/events', {
+            title,
+            description,
+            mandalId,
+            requesterId,
+            slots
+          });
+    ...
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      await axios.post('http://localhost:3001/api/events', {
-        title,
-        description,
-        mandalId,
-        requesterId,
-        slots
-      });
       setSubmitted(true);
     } catch (error) {
       console.error(error);

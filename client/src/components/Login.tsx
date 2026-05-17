@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../api';
 import { ShieldCheck } from 'lucide-react';
 import PhoneInput from './PhoneInput';
 
@@ -14,7 +14,7 @@ const Login = ({ onLogin }: { onLogin: (userData: any) => void }) => {
     e.preventDefault();
     try {
       const fullPhone = `${phonePrefix}${phone}`;
-      const response = await axios.post('http://localhost:3001/api/auth/login', {
+      const response = await api.post('/api/auth/login', {
         phone: fullPhone,
         mandalId: 'demo-id', // Default to demo if logging in generically
         name: name || 'Anonymous Member'
